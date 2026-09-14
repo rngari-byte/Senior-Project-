@@ -5,13 +5,9 @@ This semester, I have the opportunity to develop a project of my choice. Buildin
 College of Computing and Informatics | Undergraduate Research
 
 ## Overview
+This project is a browser extension designed to help users identify manipulated or AI-generated images while browsing social media. The extension can be used across different social media platforms and allows users to check an image without leaving the website they are currently using.
 
-This research prototype explores how spatial audio can augment traditional assistive technologies for people with visual impairments. Using Apple Vision Pro's ARKit capabilities, the app:
-
-- **Detects objects** in 3D space using custom reference objects
-- **Tracks objects** continuously with real-time position updates
-- **Generates spatial audio cues** where pitch increases as objects get closer (Doppler-style feedback)
-- **Displays visual overlays** with wireframe bounding boxes and live metrics for sighted researchers
+The goal is to make deepfake and image manipulation detection easier and more accessible to everyday users. Instead of requiring users to upload an image to a separate website, the extension can analyze an image directly from a social media page and provide a simple result indicating whether the image is likely authentic, AI-generated, or manipulated.
 
 ### Key Features
 
