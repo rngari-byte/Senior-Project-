@@ -22,25 +22,38 @@ Simple Results: Uses clear indicators such as Likely Authentic, Uncertain, or Li
 
 ## Technology Stack
 
-Python — AI model and image analysis
-TensorFlow / PyTorch — Deepfake detection model
-JavaScript — Browser extension functionality
-HTML/CSS — Extension interface
-Chrome Extension API — Browser integration
-Computer Vision / Image Processing — Image preprocessing and analysis
+JavaScript — Chrome extension logic (content script, background service worker)
+HTML/CSS — extension popup and on-page badge UI
+Chrome Extension API (Manifest V3) — browser integration on Instagram and TikTok (web)
+Node.js / Express — backend server that mediates between the extension and the detection API
+Hive AI Deepfake/AI-Generated Image Detection API — provides the actual detection model. Based on my summer research comparing five detectors (DFBench, Hive AI, SID-Set, Logistic Regression, Random Forest) under realistic social-media-style transformations, CNN-based detectors like Hive AI outperformed traditional machine learning models, so the project uses an existing, maintained CNN-based detector rather than training one from scratch this semester.
+Replit — hosts the backend server so it's reachable from the extension without needing local infrastructure
 
 ---
 
 ## How It Works
 
-1. Image Selection
+Image Detection on the Page: A content script scans the page for images as the user scrolls Instagram or TikTok (web), and attaches a small "AI?" badge to each sufficiently large image.
+User-Initiated Check: The user clicks the badge on any image they want checked. This is intentional — the extension does not automatically scan every image, both to control API costs and to give the user control over what gets analyzed.
+Request Routing: Clicking the badge sends the image URL to the extension's background service worker, which forwards it to a backend server (hosted on Replit) rather than calling the detection API directly. This keeps the API key private and off the client side.
+Deepfake Detection: The backend forwards the image to the Hive AI API, which analyzes it and returns classification scores. The backend simplifies this into a single label (ai_generated / not_ai_generated) and confidence percentage.
+Result Display: The badge updates in place to show the result, e.g., "AI 82%" or "Real 91%," with the confidence percentage shown as a tooltip.
 
-When a user encounters an image on a supported social media website, they can right-click the image or select the Reality Check extension.
+---
 
-2. Image Preprocessing
+#Progress Log
 
-The extension captures the selected image and prepares it for the detection model. The image can be resized, normalized, and processed to match the model's required input format.
+Week 1–2: Extension skeleton and backend wiring
+Built the Chrome extension (Manifest V3): content script for image detection and badge UI, background service worker for message passing, popup for settings.
+Built the Node/Express backend and integrated Hive AI's /task/sync detection endpoint.
+Verified the backend runs correctly, and the /detect endpoint responds as expected.
+Deployed the backend to Replit (chosen due to local development constraints on a Chromebook) at a public URL, avoiding the need for a local Node.js installation.
+Loaded the extension into Chrome via Developer Mode and confirmed it installs without errors.
+Currently debugging: the badge is not yet appearing on Instagram — narrowing down whether the content script is running via console logging; next step in the plan.
 
-3. Deepfake Detection
+Known issues / in progress
+Confirming the content script actually loads on Instagram's page (added a console log for verification).
+Need to confirm badges appear once the content script is confirmed running, then test the full click → detect → result flow end-to-end.
+www. vs non-www. URL variants for Instagram/TikTok have already been added to the manifest to avoid missed matches.
 
-The processed image is sent to the AI detection model. The model analyzes visual patterns that may indicate that the image was generated or manipulated.
+
