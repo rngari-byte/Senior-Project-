@@ -1,12 +1,11 @@
 // content.js
 // Runs on Instagram/TikTok web pages. Finds images, attaches a small badge
 // to each one, and requests a detection result when the user clicks it.
-console.log("AI Image Checker: content script loaded!");
+
 const MIN_IMAGE_SIZE = 150; // ignore tiny icons/avatars/emoji
 const processedImages = new WeakSet();
 
 function shouldSkipImage(img) {
-  if (processedImages.has(img)) return true;
   if (img.naturalWidth && img.naturalWidth < MIN_IMAGE_SIZE) return true;
   if (img.naturalHeight && img.naturalHeight < MIN_IMAGE_SIZE) return true;
   if (!img.src || img.src.startsWith("data:")) return true; // skip inline/base64 icons
@@ -19,7 +18,6 @@ function createBadge(img) {
   badge.textContent = "AI?";
   badge.title = "Click to check if this image is AI-generated";
 
-  // Position the badge over the image's parent container.
   img.parentElement.style.position =
     img.parentElement.style.position || "relative";
 
@@ -66,17 +64,17 @@ function runDetection(img, badge) {
 function scanForImages() {
   const images = document.querySelectorAll("img");
   images.forEach((img) => {
-    if (shouldSkipImage(img)) return;
-    processedImages.add(img);
+    if (processedImages.has(img)) return; // already handled this exact image
 
-    // Wait for the image to actually have real dimensions before badging it,
-    // since Instagram/TikTok lazy-load a lot of placeholder images.
     if (img.complete && img.naturalWidth > 0) {
+      processedImages.add(img);
       if (!shouldSkipImage(img)) createBadge(img);
     } else {
       img.addEventListener(
         "load",
         () => {
+          if (processedImages.has(img)) return;
+          processedImages.add(img);
           if (!shouldSkipImage(img)) createBadge(img);
         },
         { once: true }
