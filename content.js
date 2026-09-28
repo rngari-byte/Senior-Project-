@@ -1,7 +1,7 @@
 // content.js
 // Runs on Instagram/TikTok web pages. Finds images, attaches a small badge
 // to each one, and requests a detection result when the user clicks it.
-
+console.log("AI Image Checker: content script loaded!");
 const MIN_IMAGE_SIZE = 150; // ignore tiny icons/avatars/emoji
 const processedImages = new WeakSet();
 
